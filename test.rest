@@ -1,0 +1,51 @@
+###
+GET http://127.0.0.1:8000/api/messages
+
+###
+GET http://127.0.0.1:8000/api/messages/3
+
+###
+GET http://127.0.0.1:8000/api/messages/description/comment
+
+###
+GET http://127.0.0.1:8000/api/messages/titre/faire
+
+###
+GET http://127.0.0.1:8000/api/messages/auteur/joseph
+
+###
+DELETE http://127.0.0.1:8000/api/messages/123
+
+###
+POST http://127.0.0.1:8000/api/messages
+Content-Type: application/json
+
+{
+    "titre":"Mon ami le shrimp",
+    "auteur":"George Clooney",
+    "description":"Histoire de rencontre entre deux amis",
+    "date":"2008-02-18",
+    "langue":"english",
+    "commentaire":"piece of trash"
+}
+
+###
+PUT http://127.0.0.1:8000/api/messages/61770f4aabe8a0b17b5f1889
+Content-Type: application/json
+
+{
+    "commentaire": [],
+    "_id": "61770f4aabe8a0b17b5f1889",
+    "titre": "Comment faire fructifier votre argent sans risques",
+    "auteur": "joseph@trucmachin.com",
+    "description": "Dans ce sujet nous allons discuter des possibilités de faire fructifier votre argent sans prendre de risques",
+    "langue": "english",
+    "date": "2022-10-23T04:00:00.000Z",
+    "commentaires": [
+      {
+        "commentaire": "Colisse",
+        "auteur": "jtecroispas@ici.com",
+        "date": "2022-10-25T04:00:00.000Z"
+      }
+    ]
+}
