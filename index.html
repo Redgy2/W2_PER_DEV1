@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Devoir 2</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            showMsg();
+            fetch("/api/messages")
+            .then(res => res.json())
+            .then(data => {
+                let tousmesLi = data.map(valeur => affiche(valeur));
+                $("#principal").html("<ul>" + tousmesLi.join(" ") + "</ul>");
+                $(".inferieur").hide();
+            $(".superieur").click(function() {
+                $(".inferieur").hide();
+               $(this).find("div.inferieur").show();
+            });
+            })
+            .catch(erreur => console.log(erreur));
+            $(".ajout").click(function() {
+               $(".ajoutDiscussion").html(`
+               <fieldset>
+                    <legend>Ajout d'une discussion</legend>
+                    <p>Titre: <input type="text" id="addMessTitre"></p>
+                    <p class="desc">Description:</p> <textarea id="txtArea" rows="4" cols="50"></textarea>
+                    <p><button id="confirmAjout">Confirmer l'ajout d'une discussion</button></p>
+                </fieldset>
+               `);
+               $("#confirmAjout").click(function(){
+                $(this).hide();
+                let date = new Date();
+                let year = date.getFullYear();
+                let month = date.getMonth() + 1;
+                let day = date.getDate();
+                let unMessage = {};
+                unMessage.titre = $("#addMessTitre").val();
+                unMessage.auteur = "jo@toto.com";  
+                unMessage.description = $("#txtArea").val();
+                unMessage.date = year +"-"+ month +"-"+ day;
+                unMessage.langue = "francais";
+                unMessage.commentaire = [];
+                postMessage(unMessage);
+               });
+            });
+        });
+
+        function postMessage(message) {
+            const url = "/api/messages";
+            fetch(url, {
+                method:"POST",
+                body: JSON.stringify(message),
+                headers: {
+                    "Content-type": "application/json; charset=UTF-8"
+                }
+            })
+            .then(res => res.json())
+            .then(resultat => {
+                console.log("resultat du post:", resultat);
+                $(".ajoutDiscussion").html("");
+                $(".ajout").show();
+                showMsg();
+            })
+            .catch(err => console.log(err));
+        }
+
+        function affiche(message){
+            console.log("message : ", message);
+            return `<li class="superieur">
+                <p class="col dis">${message.titre}</p>
+                <p class="col space">${message.auteur}</p>
+                <p class="col space1">${message.date}</p>
+                <p class="col space2">${tabReponse(message.commentaire)}</p>
+                <div class="inferieur">
+                    <fieldset>
+                        <legend>Discussion par ${message.auteur} - ${message.date} <button onclick="deleteMsg('${message._id}')">Supprimer la discussion</button></legend>
+                        <b><p>${message.titre}</p></b>
+                        <p class="comment">${message.commentaire}</p>
+                    </fieldset>
+                    <fieldset>
+                        <legend>Réponse ${reponse()} par ${message.auteur} - ${message.date}</legend>
+                        <p >${message.commentaire}</p>                    
+                    </fieldset>
+                    <p><button>Répondre</button></p>
+                </div>
+            </li>` 
+        }
+
+        function deleteMsg(id){
+            let reponse = confirm("Voulez vous vraiment supprimer la discussion?");
+            if (!reponse) {
+                return;
+            }
+            const url = "/api/messages/" + id;
+            fetch(url,{
+                method: "DELETE"
+            })
+            .then(res => res.json())
+            .then(resultat => {
+                console.log("resultat du delete:", resultat);
+                showMsg();
+            })
+            .catch(err => console.log(err));
+        }
+        
+
+        function showMsg (){
+            fetch("/api/messages")
+            .then(res => res.json())
+            .then(data => {
+                let tousmesLi = data.map(valeur => affiche(valeur));
+                $("#principal").html("<ul>" + tousmesLi.join(" ") + "</ul>");
+                $(".inferieur").hide();
+            $(".superieur").click(function() {
+                $(".inferieur").hide();
+               $(this).find("div.inferieur").show();
+            });
+            })
+            .catch(erreur => console.log(erreur));
+        }
+
+        function reponse(){
+            let total = 0;
+            total++;   
+            return `${total}`;
+        }
+
+        function tabReponse(array){
+            let total = 0;
+            for (let i = 0; i < array.length; i++) {
+                total++;            
+            }
+            return `${total}`;
+        }
+
+       
+    </script>
+    <style>
+        ul {
+            margin: 0px;
+            padding: 0px;
+        }
+        li {
+            display: block;
+            margin: 10px 0px;
+            background-color:lavender
+        }
+        .col {
+            display: inline-block;
+                      
+        }
+        .dis {
+            width: 40%;
+        }
+        .space {
+            width: 20%;
+        }
+        .space1 {
+            width: 20%;
+        }
+        .space2 {
+            width: 15%;
+        }
+        fieldset {
+            background-color: white;
+        }
+        #addMessTitre {
+            margin-left: 60px;
+        }
+
+    </style>
+</head>
+<body>
+    <h1>Canal de discussion du TP1</h1>
+    <button class="ajout">Ajouter une discussion</button>
+    <div class="ajoutDiscussion">      
+    </div>
+    <div id="entente">
+        <p class="col dis">Discussion</p>
+        <p class="col space">Lancée par</p>
+        <p class="col space1">Dernière réponse</p>
+        <p class="col space2">Réponses</p>
+    </div>
+    <hr>
+    <div id="principal">
+       
+    </div>
+    
+
+    
+</body>
+</html>
