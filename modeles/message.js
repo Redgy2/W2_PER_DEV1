@@ -1,6 +1,6 @@
 /*
 *Redgy Pérard
-*8 mars 2023
+*3 avril 2023
 *./modeles/message.js
 *modèle Mongoose pour accéder à la collection message
 */
@@ -61,7 +61,7 @@ module.exports.ajoutMessage = (message, callback) => {
     Messages.create(message, callback);
 }
 
-// méthode pour supprimer un livre dans la BD
+// méthode pour supprimer un message dans la BD
 module.exports.supprimerMessage = (idMessage, callback) => {
     let filtre = { "_id": idMessage };
     Messages.deleteOne(filtre, callback);

@@ -2,63 +2,61 @@ const express = require('express');
 const router = express.Router();
 
 const Messages = require('../modeles/message.js');
+const mongoose = require("mongoose");
 
 router.get('/', (requete, reponse) => {
-    Messages.getMessage((err, message)=>{
-        if (err) throw err;
-        reponse.json(message);
-    }, 250);
+    Messages.find({}, null, {limit:3, sort:{auteur:-1}}).exec()
+    .then((messages)=>reponse.json(messages))
+    .catch((err)=>console.log(err));
+    
 });
 
-router.get('/:id', (requete, reponse) => {
-    Messages.getMessageParChamp("_id", requete.params.id, (err, message)=>{
-        if (err) throw err;
-        reponse.json(message);
-    });
+router.get('/:id', (requete, reponse) => {    
+     Messages.find({_id: RegExp(requete.params.id)}, null, {limit:3, sort:{auteur:1}}).exec()
+    .then((messages)=>reponse.json(messages))
+    .catch((err)=>console.log(err));        
 });
 
 router.get('/description/:texte', (requete, reponse) => {
-    Messages.getMessageParChamp("description", requete.params.texte, (err, message)=>{
-        if (err) throw err;
-        reponse.json(message);
-    },250);
+    Messages.find({description: RegExp(requete.params.texte)}, null, {limit:3, sort:{auteur:1}}).exec()
+    .then((messages)=>reponse.json(messages))
+    .catch((err)=>console.log(err)); 
 });
 
 router.get('/titre/:texte', (requete, reponse) => {
-    Messages.getMessageParChamp("titre", requete.params.texte, (err, message)=>{
-        if (err) throw err;
-        reponse.json(message);
-    },250);
+    Messages.find({titre: RegExp(requete.params.texte)}, null, {limit:3, sort:{auteur:1}}).exec()
+    .then((messages)=>reponse.json(messages))
+    .catch((err)=>console.log(err)); 
 });
 
 router.get('/auteur/:texte', (requete, reponse) => {
-    Messages.getMessageParChamp("auteur", requete.params.texte, (err, message)=>{
-        if (err) throw err;
-        reponse.json(message);
-    },250);
+    Messages.find({auteur: RegExp(requete.params.texte,"i")}, null, {limit:3, sort:{titre:1}}).exec()
+    .then((messages)=>reponse.json(messages))
+    .catch((err)=>console.log(err)); 
 });
 
 router.delete('/:id', (requete, reponse)=>{
-    Messages.supprimerMessage(requete.params.id, (err, message) => {
-        if (err) throw err;
-        reponse.json(message);
-    });
+    Messages.deleteOne({_id: requete.params.id})
+    .then(res=>reponse.json(res))
+    .catch(err=>console.log(err));
 });
 
 router.post('/', (requete, reponse) => {
     let msg = requete.body;
-    Messages.ajoutMessage( msg, (err, retourMessage)=>{
-        if (err) throw err;
-        reponse.json(retourMessage);
-    });
+    msg._id = new mongoose.Types.ObjectId();
+    Messages.create(msg)
+    .then(resultat=>reponse.json(resultat))
+    .catch(err=>console.log(err));
 });
 
 router.put('/:id', (requete, reponse)=>{
     let nouveauMessage = requete.body;
-    Messages.modifierMessage(requete.params.id, nouveauMessage, (err, resultat) => {
-        if (err) throw err;
-        reponse.json(resultat);
-    });
+    Messages.findOneAndUpdate(
+        {_id: requete.params.id},
+        nouveauMessage,
+        {new:true})
+    .then(resultat=>reponse.json(resultat))
+    .catch(err=>console.log(err));   
 });
 
 module.exports = router;

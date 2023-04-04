@@ -19,6 +19,7 @@ router.get('/index.html', (requete, reponse) => {
     lirePageWeb('index.html', reponse);
 });
 
+
 function lirePageWeb(nomPageWeb, reponse) {
     const fs = require('fs');
     const path = require('path');
